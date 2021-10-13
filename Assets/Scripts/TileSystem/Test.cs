@@ -8,6 +8,6 @@ public class Test : MonoBehaviour
     public int tilemapSizeX = 0;
     void OnValidate()
     {
-        TileManager.instance.UpdateGrid();
+        TileManager.instance.UpdateTileMap();
     }
 }
