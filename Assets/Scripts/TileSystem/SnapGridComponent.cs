@@ -9,12 +9,26 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class SnapGridComponent : MonoBehaviour
 {
+    [Tooltip("pivot 위치가 발 밑이 아닌 경우에 사용을 추천합니다.")]
+    public bool isSnapWithColliderHeight = false;
+
+    [Tooltip("해당 게임오브젝트의 크기를 tileScale 크기로 덮어씁니다.")]
+    public bool isCoverScaleWithTileScale = false;
+
+    [Tooltip("해당 게임오브젝트가 차지하는 타일 수. 정수형만 가능합니다.")]
+    public Vector3 tileScale = Vector3.one;
+    private Vector3 savedScale = Vector3.one;
     void Update()
     {
         if (transform.hasChanged)
         {
             SnapGrid();
         }
+    }
+
+    void OnValidate()
+    {
+        ConvertScaleInt();
     }
 
     void SnapGrid()
@@ -48,7 +62,26 @@ public class SnapGridComponent : MonoBehaviour
             }
             SKIP_Z_LOOP: { }
         }
-
+        if(isSnapWithColliderHeight) {
+            if (tileScale.x % 2 == 0) targetPosition += new Vector3(tileManager.tileScale_Meter * 0.5f, 0, 0);
+            if (tileScale.z % 2 == 0) targetPosition += new Vector3(0, 0, tileManager.tileScale_Meter * 0.5f);
+            targetPosition.Set(targetPosition.x, targetPosition.y + (GetColliderHeight() * 0.5f), targetPosition.z);
+        }
         transform.position = targetPosition;
+    }
+
+    void ConvertScaleInt()
+    {
+        savedScale = isCoverScaleWithTileScale ? transform.localScale : savedScale;
+        tileScale.Set(Mathf.Floor(tileScale.x), Mathf.Floor(tileScale.y), Mathf.Floor(tileScale.z));
+        transform.localScale = isCoverScaleWithTileScale ? tileScale : savedScale;
+    }
+
+    float GetColliderHeight()
+    {
+        float result = 0.0f;
+        Collider collider = GetComponent<Collider>();
+        if (collider != null) result = collider.transform.localScale.y;
+        return result;
     }
 }
