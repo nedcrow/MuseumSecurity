@@ -57,29 +57,33 @@ public class TileManager : MonoBehaviour
 
     void UpdateMesh()
     {
-        GameObject cubeMap = transform.GetChild(0).gameObject;
-        cubeMap.transform.localScale = new Vector3(tilemapSizeX, 0.1f, tilemapSizeZ);
+        // scale
+        GameObject meshObj = transform.GetChild(0).gameObject;
+        meshObj.transform.localScale = new Vector3(tilemapSizeX * tileScale_Meter, 0.1f, tilemapSizeZ * tileScale_Meter);
 
-        bool isNullGridMaterial = !cubeMap.GetComponent<Renderer>().sharedMaterial ||
-            !cubeMap.GetComponent<Renderer>().sharedMaterial.mainTexture ||
-            cubeMap.GetComponent<Renderer>().sharedMaterial.mainTexture.name == null ||
-            cubeMap.GetComponent<Renderer>().sharedMaterial.mainTexture.name != "Grid";
+        // grid
+        Material tempMaterial = meshObj.GetComponent<Renderer>().sharedMaterial;
+        bool isNullGridMaterial = tempMaterial == null || 
+            tempMaterial.mainTexture == null ||
+            tempMaterial.mainTexture.name == null ||
+            tempMaterial.mainTexture.name != "Grid";
 
         if (isNullGridMaterial)
         {
-            Material m = Resources.Load("Materials/Grid", typeof(Material)) as Material;
-
-            bool isNullGridMaterialResource = !m || m == null;
-            if (!isNullGridMaterialResource)
-            {
-                m.mainTextureScale.Set(tilemapSizeX, tilemapSizeZ);
-                cubeMap.GetComponent<Renderer>().material = m;
-            }
-            else
-            {
-                Debug.Log("Warning. Has not material [ Resources/Materials/Grid ].");
-            }
+            tempMaterial = Resources.Load("Materials/Grid", typeof(Material)) as Material;
         }
+
+        bool isNullGridMaterialResource = !tempMaterial || tempMaterial == null;
+        if (!isNullGridMaterialResource)
+        {
+            tempMaterial.mainTextureScale = new Vector2(tilemapSizeX, tilemapSizeZ);
+            meshObj.GetComponent<Renderer>().material = tempMaterial;
+        }
+        else
+        {
+            Debug.Log("Warning. Has not material [ Resources/Materials/Grid ].");
+        }
+
     }
 
     void UpdateTileLocations()

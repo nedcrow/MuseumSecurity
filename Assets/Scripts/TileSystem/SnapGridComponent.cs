@@ -63,8 +63,13 @@ public class SnapGridComponent : MonoBehaviour
             SKIP_Z_LOOP: { }
         }
         if(isSnapWithColliderHeight) {
-            if (tileScale.x % 2 == 0) targetPosition += new Vector3(tileManager.tileScale_Meter * 0.5f, 0, 0);
-            if (tileScale.z % 2 == 0) targetPosition += new Vector3(0, 0, tileManager.tileScale_Meter * 0.5f);
+            GameObject child = transform.GetChild(0).gameObject;
+            if (child != null)
+            {
+                float childPosX = tileScale.x % 2 == 0 ? tileManager.tileScale_Meter * 0.5f : 0;
+                float childPosZ = tileScale.z % 2 == 0 ? tileManager.tileScale_Meter * 0.5f : 0;
+                child.transform.localPosition = new Vector3(childPosX / tileScale.x, 0, childPosZ / tileScale.z);
+            }            
             targetPosition.Set(targetPosition.x, targetPosition.y + (GetColliderHeight() * 0.5f), targetPosition.z);
         }
         transform.position = targetPosition;
